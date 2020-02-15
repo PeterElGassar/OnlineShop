@@ -27,10 +27,7 @@ namespace OnlineShop.DataAccess.InMemory
             }
         }
 
-        public void Commit()
-        {
-            cache["products"] = products;
-        }
+      
 
         public void Insert(Product product)
         {
@@ -55,6 +52,7 @@ namespace OnlineShop.DataAccess.InMemory
         public Product find(string id)
         {
             var getProduct = products.Find(p => p.Id == id);
+
             if (getProduct != null)
             {
                 return getProduct;
@@ -71,7 +69,6 @@ namespace OnlineShop.DataAccess.InMemory
             return products.AsQueryable();
         }
 
-
         public void Delete(string id)
         {
             Product getProductToDel = products.Find(p => p.Id == id);
@@ -84,6 +81,12 @@ namespace OnlineShop.DataAccess.InMemory
             {
                 throw new Exception("Product Not Found");
             }
+        }
+
+        //Save Changes In Cache Object
+        public void Commit()
+        {
+            cache["products"] = products;
         }
 
 
