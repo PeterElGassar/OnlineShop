@@ -8,9 +8,10 @@ using System.ComponentModel;
 
 namespace OnlineShop.Core.Models
 {
-    public class Product
+    public class Product:BaseEntity
     {
-        public string Id { get; set; }
+        // this Class Already Inhertince Id Prop From Base Class
+        //public string Id { get; set; }
 
 
         [StringLength(30, ErrorMessage = "The maximum length of Name is 30 Charachter")]
@@ -28,10 +29,10 @@ namespace OnlineShop.Core.Models
         /// <summary>
         /// In this constructor i will Genrat Id  
         /// </summary>
-        public Product()
-        {
-            Id = Guid.NewGuid().ToString();
-        }
+        //public Product()
+        //{
+        //    Id = Guid.NewGuid().ToString();
+        //}
 
     }
 }

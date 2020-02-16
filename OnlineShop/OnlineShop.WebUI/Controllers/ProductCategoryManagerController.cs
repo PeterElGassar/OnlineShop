@@ -11,12 +11,12 @@ namespace OnlineShop.WebUI.Controllers
 {
     public class ProductCategoryManagerController : Controller
     {
-        ProductCategoryRepository context;
+        InMemoryRepository<ProductCategory> context;
 
 
         public ProductCategoryManagerController()
         {
-            context = new ProductCategoryRepository();
+            context = new InMemoryRepository<ProductCategory>();
         }
 
         public ActionResult Index()
@@ -51,7 +51,7 @@ namespace OnlineShop.WebUI.Controllers
 
         public ActionResult Edit(string id)
         {
-            ProductCategory productCategory = context.find(id);
+            ProductCategory productCategory = context.Find(id);
 
             if (productCategory == null)
             {
@@ -67,7 +67,7 @@ namespace OnlineShop.WebUI.Controllers
         public ActionResult Edit(ProductCategory productCategory, string id)
         {
             //First Find Specific Item To Edit id
-            ProductCategory CategoryToEdit = context.find(id);
+            ProductCategory CategoryToEdit = context.Find(id);
 
             //Second Check it If Null Or Not
             if (CategoryToEdit == null)
@@ -91,7 +91,7 @@ namespace OnlineShop.WebUI.Controllers
 
         public ActionResult Delete(string id)
         {
-            ProductCategory CategoryToDelete = context.find(id);
+            ProductCategory CategoryToDelete = context.Find(id);
 
             if (CategoryToDelete == null)
             {
@@ -107,7 +107,7 @@ namespace OnlineShop.WebUI.Controllers
         [ActionName("Delete")]
         public ActionResult ConfirmDelete(string id)
         {
-            ProductCategory CategoryToDelete = context.find(id);
+            ProductCategory CategoryToDelete = context.Find(id);
 
             if (CategoryToDelete == null)
             {

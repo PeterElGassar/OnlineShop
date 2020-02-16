@@ -5,20 +5,19 @@ using System.Web;
 using System.Web.Mvc;
 using OnlineShop.Core.Models;
 using OnlineShop.Core.ViewModels;
-
 using OnlineShop.DataAccess.InMemory;
 
 namespace OnlineShop.WebUI.Controllers
 {
     public class ProductManagerController : Controller
     {
-        ProductRepository context;
-        ProductCategoryRepository ProductCategoris;
+        InMemoryRepository<Product> context;
+        InMemoryRepository<ProductCategory> ProductCategoris;
 
         public ProductManagerController()
         {
-            context = new ProductRepository();
-            ProductCategoris = new ProductCategoryRepository();
+            context = new InMemoryRepository<Product>();
+            ProductCategoris = new InMemoryRepository<ProductCategory>();
         }
         // GET: ProductManager
         public ActionResult Index()
@@ -55,7 +54,7 @@ namespace OnlineShop.WebUI.Controllers
 
         public ActionResult Edit(string id)
         {
-            Product product = context.find(id);
+            Product product = context.Find(id);
 
             if (product == null)
             {
@@ -75,7 +74,7 @@ namespace OnlineShop.WebUI.Controllers
         public ActionResult Edit(Product product, string id)
         {
             //First Find Specific Item To Edit id
-            Product productToEdit = context.find(id);
+            Product productToEdit = context.Find(id);
 
             //Second Check it If Null Or Not
             if (productToEdit == null)
@@ -103,7 +102,7 @@ namespace OnlineShop.WebUI.Controllers
 
         public ActionResult Delete(string id)
         {
-            Product productToDelete = context.find(id);
+            Product productToDelete = context.Find(id);
 
             if (productToDelete == null)
             {
@@ -119,7 +118,7 @@ namespace OnlineShop.WebUI.Controllers
         [ActionName("Delete")]
         public ActionResult ConfirmDelete(string id)
         {
-            Product productToDelete = context.find(id);
+            Product productToDelete = context.Find(id);
 
             if (productToDelete == null)
             {

@@ -4,19 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OnlineShop.Core
+namespace OnlineShop.Core.Models
 {
-    public class ProductCategory
+   public class ProductCategory:BaseEntity
     {
-
-        public string Id { get; set; }
-
         public string Name { get; set; }
-
-        public ProductCategory()
-        {
-            Id = Guid.NewGuid().ToString();
-        }
-
     }
 }
