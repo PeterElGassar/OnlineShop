@@ -6,17 +6,18 @@ using System.Web.Mvc;
 using OnlineShop.DataAccess.InMemory;
 using OnlineShop.Core.Models;
 using OnlineShop.Core;
+using OnlineShop.Core.Contracts;
 
 namespace OnlineShop.WebUI.Controllers
 {
     public class ProductCategoryManagerController : Controller
     {
-        InMemoryRepository<ProductCategory> context;
+        IRepository<ProductCategory> context;
 
-
-        public ProductCategoryManagerController()
+        //Ctor Injected 
+        public ProductCategoryManagerController(IRepository<ProductCategory> context)
         {
-            context = new InMemoryRepository<ProductCategory>();
+            this.context = context;
         }
 
         public ActionResult Index()

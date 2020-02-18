@@ -1,4 +1,5 @@
-﻿using OnlineShop.Core.Models;
+﻿using OnlineShop.Core.Contracts;
+using OnlineShop.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OnlineShop.DataAccess.InMemory
 {
-    public class InMemoryRepository<T> where T :  BaseEntity 
+    public class InMemoryRepository<T> : IRepository<T> where T :  BaseEntity 
     {
 
         ObjectCache cache = MemoryCache.Default;
@@ -85,5 +86,7 @@ namespace OnlineShop.DataAccess.InMemory
                 throw new Exception(className + "Not Found");
             }
         }
+
+        public void test() { }
     }
 }

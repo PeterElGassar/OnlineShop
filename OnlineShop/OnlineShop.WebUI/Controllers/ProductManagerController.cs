@@ -6,19 +6,23 @@ using System.Web.Mvc;
 using OnlineShop.Core.Models;
 using OnlineShop.Core.ViewModels;
 using OnlineShop.DataAccess.InMemory;
+using OnlineShop.Core.Contracts;
 
 namespace OnlineShop.WebUI.Controllers
 {
     public class ProductManagerController : Controller
     {
-        InMemoryRepository<Product> context;
-        InMemoryRepository<ProductCategory> ProductCategoris;
+        IRepository<Product> context;
+        IRepository<ProductCategory> ProductCategoris;
 
-        public ProductManagerController()
+        //Ctor Inject Tow Interfaces To Every Instance
+        public ProductManagerController(IRepository<Product> productContext,
+            IRepository<ProductCategory> productCategoryContext)
         {
-            context = new InMemoryRepository<Product>();
-            ProductCategoris = new InMemoryRepository<ProductCategory>();
+            context = productContext;
+            ProductCategoris = productCategoryContext;            
         }
+
         // GET: ProductManager
         public ActionResult Index()
         {
