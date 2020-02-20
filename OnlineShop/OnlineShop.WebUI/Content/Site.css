@@ -22,3 +22,25 @@ select,
 textarea {
     max-width: 280px;
 }
+
+
+.insert-image-div{
+    padding:50px 0;
+}
+
+.insert-image-div .row img#imagePreview{
+    width:100%;
+}
+
+.inputFile-div{
+    color: #ffffff;
+    background-color: #428bca;
+    border-color: #357ebd;
+    padding: 9px;
+    border-radius: 5px;
+    width: 230px;
+    margin-bottom:10px
+}
+.Perview-img{
+    padding-left:28px
+}
