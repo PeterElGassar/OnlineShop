@@ -4,6 +4,20 @@
     ViewBag.Title = "Edit";
 }
 
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Message"]
+    </div>
+}
+
 <h2>Edit</h2>
 
 
@@ -16,6 +30,9 @@
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.Product.Id)
+        @Html.HiddenFor(model => model.Product.Image)
+
+
         <div class="row">
             <div class="col-md-8">
                 <div class="form-group">

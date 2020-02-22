@@ -1,4 +1,6 @@
-﻿using System;
+﻿using OnlineShop.Core.Contracts;
+using OnlineShop.Core.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -8,23 +10,32 @@ namespace OnlineShop.WebUI.Controllers
 {
     public class HomeController : Controller
     {
+        IRepository<Product> context;
+        IRepository<ProductCategory> productCategories;
+
+        public HomeController(IRepository<Product> context, IRepository<ProductCategory> productCategories)
+        {
+            this.context = context;
+            this.productCategories = productCategories;
+        }
+
         public ActionResult Index()
         {
-            return View();
+            List<Product> productList = context.Collection().ToList();
+            return View(productList);
         }
 
-        public ActionResult About()
+        public ActionResult Details(string id)
         {
-            ViewBag.Message = "Your application description page.";
+            var product = context.Find(id);
+            if (product == null)
+            {
+                return HttpNotFound();
+            }
 
-            return View();
+
+            return View(product);
         }
 
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
-        }
     }
 }

@@ -24,23 +24,43 @@ textarea {
 }
 
 
-.insert-image-div{
-    padding:50px 0;
+.insert-image-div {
+    padding: 50px 0;
 }
 
-.insert-image-div .row img#imagePreview{
-    width:100%;
-}
+    .insert-image-div .row img#imagePreview {
+        width: 100%;
+    }
 
-.inputFile-div{
+/*Start From Here */
+
+.inputFile-div {
     color: #ffffff;
     background-color: #428bca;
     border-color: #357ebd;
     padding: 9px;
     border-radius: 5px;
     width: 230px;
-    margin-bottom:10px
+    margin-bottom: 10px;
 }
-.Perview-img{
-    padding-left:28px
+
+.Perview-img {
+    padding-left: 28px;
 }
+
+/*Cart Product*/
+
+.product-card center{
+    height: 200px;  
+}
+.product-card {
+    /*width:25%;*/
+    height: 350px;
+    padding: 10px;
+    margin: 10px;
+}
+
+    .product-card img {
+        width: 190px;
+        height: 100%;
+    }

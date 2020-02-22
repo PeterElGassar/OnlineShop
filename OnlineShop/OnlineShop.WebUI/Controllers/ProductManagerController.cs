@@ -17,14 +17,14 @@ namespace OnlineShop.WebUI.Controllers
     public class ProductManagerController : Controller
     {
         IRepository<Product> context;
-        IRepository<ProductCategory> ProductCategoris;
+        IRepository<ProductCategory> productCategoris;
 
         //Ctor Inject Tow Interfaces To Every Instance
         public ProductManagerController(IRepository<Product> productContext,
             IRepository<ProductCategory> productCategoryContext)
         {
             context = productContext;
-            ProductCategoris = productCategoryContext;
+            productCategoris = productCategoryContext;
         }
 
         // GET: ProductManager
@@ -39,7 +39,7 @@ namespace OnlineShop.WebUI.Controllers
             ProductManagerVM viewModel = new ProductManagerVM();
 
             viewModel.Product = new Product();
-            viewModel.Categories = ProductCategoris.Collection().ToList();
+            viewModel.Categories = productCategoris.Collection().ToList();
             return View(viewModel);
         }
 
@@ -144,16 +144,18 @@ namespace OnlineShop.WebUI.Controllers
             {
                 ProductManagerVM viewModel = new ProductManagerVM();
                 viewModel.Product = product;
-                viewModel.Categories = ProductCategoris.Collection();
+                viewModel.Categories = productCategoris.Collection();
 
                 return View(viewModel);
             }
         }
 
         [HttpPost]
-        public ActionResult Edit(Product product, string id, HttpPostedFileBase file)
+        public ActionResult Edit(ProductManagerVM viewModel, string id, HttpPostedFileBase file)
         {
-            //First Find Specific Item To Edit id
+            //First Thing Should Do Fill DropDown 
+            viewModel.Categories = productCategoris.Collection().ToList();
+            // Find Specific Item To Edit id
             Product productToEdit = context.Find(id);
 
             //Second Check it If Null Or Not
@@ -165,13 +167,14 @@ namespace OnlineShop.WebUI.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return View(product);
+                    return View(viewModel);
                 }
 
-                productToEdit.Name = product.Name;
-                productToEdit.Category = product.Category;
-                productToEdit.Description = product.Description;
-                productToEdit.Price = product.Price;
+                productToEdit.Name = viewModel.Product.Name;
+                productToEdit.Category = viewModel.Product.Category;
+                productToEdit.Description = viewModel.Product.Description;
+                productToEdit.Price = viewModel.Product.Price;
+                productToEdit.Image = viewModel.Product.Image;
 
                 #region Update Image
                 if (file != null && file.ContentLength > 0)
@@ -184,32 +187,42 @@ namespace OnlineShop.WebUI.Controllers
                     DirectoryInfo direct1 = new DirectoryInfo(stringPath1);
                     DirectoryInfo direct2 = new DirectoryInfo(StringPath2);
 
-                    //Get the content of the files and delete them all
-                    foreach (var file1 in direct1.GetFiles())
+                    try
                     {
-                        file1.Delete();
+                        //Get the content of the files and delete them all
+                        foreach (var file1 in direct1.GetFiles())
+                        {
+                            file1.Delete();
+                        }
+                        foreach (var file2 in direct2.GetFiles())
+                        {
+                            file2.Delete();
+                        }
+
+                        //New Image Data
+                        string imageName = file.FileName;
+                        productToEdit.Image = imageName;
+
+                        string path1 = string.Format(@"{0}\\{1}", stringPath1, imageName);
+                        file.SaveAs(path1);
+
+                        string path2 = string.Format(@"{0}\\{1}", StringPath2, imageName);
+                        WebImage img = new WebImage(file.InputStream);
+                        img.Resize(480, 640, true, true).Crop(1, 1, 1, 1).Write();
+                        img.Save(path2);
                     }
-                    foreach (var file2 in direct2.GetFiles())
+                    catch (Exception ex)
                     {
-                        file2.Delete();
+                        TempData["Error"] = ex.Message;
+
+                        return View(viewModel);
                     }
-
-                    //New Image Data
-                    string imageName = file.FileName;
-                    productToEdit.Image = imageName;
-
-                    string path1 = string.Format(@"{0}\\{1}", stringPath1, imageName);
-                    file.SaveAs(path1);
-
-                    string path2 = string.Format(@"{0}\\{1}", StringPath2, imageName);
-                    WebImage img = new WebImage(file.InputStream);
-                    img.Resize(480, 640, true, true).Crop(1, 1, 1, 1).Write();
-                    img.Save(path2);
                 }
 
                 #endregion
                 context.Commit();
-                return RedirectToAction("Index");
+                TempData["Message"] = "Product Updated Successfully";
+                return RedirectToAction("Edit");
 
             }
 
