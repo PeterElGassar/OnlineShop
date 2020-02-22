@@ -130,7 +130,6 @@ namespace OnlineShop.WebUI.Controllers
             TempData["Message"] = "Product Add Successfully";
             return RedirectToAction("Index");
 
-
         }
 
         public ActionResult Edit(string id)
