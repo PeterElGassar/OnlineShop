@@ -43,6 +43,16 @@ namespace OnlineShop.DataAccess.SQL
             _dbSet.Remove(item);
         }
 
+
+        public void DeleteBySlug(string slug)
+        {
+            var item = FindBySlug(slug);
+            if (_context.Entry(item).State == EntityState.Deleted)
+            {
+                _dbSet.Attach(item);
+            }
+            _dbSet.Remove(item);
+        }
         public T Find(string id)
         {
             return _dbSet.Find(id);
@@ -50,7 +60,8 @@ namespace OnlineShop.DataAccess.SQL
 
         public T FindBySlug(string slug)
         {
-            return _dbSet.Find(slug);
+            return _dbSet.FirstOrDefault(c => c.Slug == slug);
+            //return _dbSet.Find(slug);
         }
 
 

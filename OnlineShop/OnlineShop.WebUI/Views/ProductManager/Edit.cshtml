@@ -31,6 +31,9 @@
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.Product.Id)
         @Html.HiddenFor(model => model.Product.Image)
+        @Html.HiddenFor(model => model.Product.Slug)
+
+
 
 
         <div class="row">

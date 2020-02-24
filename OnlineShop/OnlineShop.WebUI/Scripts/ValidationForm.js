@@ -3,7 +3,6 @@
 $("#editeForm, #createForm").on("submit", function () {
     var returnVal = true;
     if ($("#Product_Name").val().trim() === "") {
-        debugger;
         //$("#Product_Name").next('span').text("please Enter Product Name").show();
         alert("please Enter Product Name");
         returnVal = false;

@@ -99,7 +99,19 @@ namespace OnlineShop.DataAccess.InMemory
                 throw new Exception(className + "Not Found");
             }
         }
+        public void DeleteBySlug(string slug)
+        {
+            T getItemToDel = items.Find(i => i.Id == slug);
 
+            if (getItemToDel != null)
+            {
+                items.Remove(getItemToDel);
+            }
+            else
+            {
+                throw new Exception(className + "Not Found");
+            }
+        }
         public void test() { }
     }
 }

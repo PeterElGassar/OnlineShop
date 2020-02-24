@@ -10,7 +10,6 @@ namespace OnlineShop.Core.ViewModels
 {
     public class ProductManagerVM
     {
-        [Required]
         public Product Product { get; set; }
 
         public IEnumerable<ProductCategory> Categories { get; set; }

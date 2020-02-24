@@ -42,6 +42,14 @@ namespace OnlineShop.WebUI.Controllers
             }
             else
             {
+                if (context.Collection().Where(c => c.Id != productCategory.Id).Any(c => c.Name == productCategory.Name))
+                {
+                    ModelState.AddModelError("NameNotUnique", "Category Name Is Exist Before");
+                    return View(productCategory);
+                }
+
+                productCategory.Slug = productCategory.Name.ToLower().Replace(" ", "-").Replace(".", "-");
+
                 context.Insert(productCategory);
                 context.Commit();
 
@@ -50,9 +58,9 @@ namespace OnlineShop.WebUI.Controllers
 
         }
 
-        public ActionResult Edit(string id)
+        public ActionResult Edit(string slug)
         {
-            ProductCategory productCategory = context.Find(id);
+            ProductCategory productCategory = context.FindBySlug(slug);
 
             if (productCategory == null)
             {
@@ -65,10 +73,10 @@ namespace OnlineShop.WebUI.Controllers
         }
 
         [HttpPost]
-        public ActionResult Edit(ProductCategory productCategory, string id)
+        public ActionResult Edit(ProductCategory productCategory)
         {
-            //First Find Specific Item To Edit id
-            ProductCategory CategoryToEdit = context.Find(id);
+            //First Find Specific Item To Edit it
+            ProductCategory CategoryToEdit = context.FindBySlug(productCategory.Slug);
 
             //Second Check it If Null Or Not
             if (CategoryToEdit == null)
@@ -81,18 +89,25 @@ namespace OnlineShop.WebUI.Controllers
                 {
                     return View(productCategory);
                 }
+                if (context.Collection().Where(c => c.Id != productCategory.Id).Any(c => c.Name == productCategory.Name))
+                {
+                    ModelState.AddModelError("NameNotUnique", "Category Name Is Exist Before");
+                    return View(productCategory);
+                }
+
                 CategoryToEdit.Name = productCategory.Name;
-              
+                CategoryToEdit.Slug = productCategory.Name.ToLower().Replace(" ", "-").Replace(".", "-");
+
                 context.Commit();
-                return RedirectToAction("Index");
+                return RedirectToAction("Edit", new { slug = CategoryToEdit.Slug });
             }
         }
 
 
 
-        public ActionResult Delete(string id)
+        public ActionResult Delete(string slug)
         {
-            ProductCategory CategoryToDelete = context.Find(id);
+            ProductCategory CategoryToDelete = context.FindBySlug(slug);
 
             if (CategoryToDelete == null)
             {
@@ -106,9 +121,9 @@ namespace OnlineShop.WebUI.Controllers
 
         [HttpPost]
         [ActionName("Delete")]
-        public ActionResult ConfirmDelete(string id)
+        public ActionResult ConfirmDelete(string slug)
         {
-            ProductCategory CategoryToDelete = context.Find(id);
+            ProductCategory CategoryToDelete = context.FindBySlug(slug);
 
             if (CategoryToDelete == null)
             {
@@ -116,7 +131,7 @@ namespace OnlineShop.WebUI.Controllers
             }
             else
             {
-                context.Delete(id);
+                context.DeleteBySlug(slug);
                 context.Commit();
                 return RedirectToAction("Index");
             }

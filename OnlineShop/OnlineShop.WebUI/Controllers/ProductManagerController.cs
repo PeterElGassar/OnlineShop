@@ -46,7 +46,7 @@ namespace OnlineShop.WebUI.Controllers
         [HttpPost]
         public ActionResult Create(ProductManagerVM viewModel, HttpPostedFileBase file)
         {
-            viewModel.Categories= productCategoris.Collection().ToList();
+            viewModel.Categories = productCategoris.Collection().ToList();
 
             //First Check Model State 
             if (!ModelState.IsValid)
@@ -158,9 +158,9 @@ namespace OnlineShop.WebUI.Controllers
 
         }
 
-        public ActionResult Edit(string id)
+        public ActionResult Edit(string slug)
         {
-            Product product = context.Find(id);
+            Product product = context.FindBySlug(slug);
 
             if (product == null)
             {
@@ -177,12 +177,14 @@ namespace OnlineShop.WebUI.Controllers
         }
 
         [HttpPost]
-        public ActionResult Edit(ProductManagerVM viewModel, string id, HttpPostedFileBase file)
+        public ActionResult Edit(ProductManagerVM viewModel, HttpPostedFileBase file)
         {
             //First Thing Should Do Fill DropDown 
+            string id = viewModel.Product.Id;
+            string slug = viewModel.Product.Slug;
             viewModel.Categories = productCategoris.Collection().ToList();
             // Find Specific Item To Edit id
-            Product productToEdit = context.Find(id);
+            Product productToEdit = context.FindBySlug(slug);
 
             //Second Check it If Null Or Not
             if (productToEdit == null)
@@ -197,7 +199,8 @@ namespace OnlineShop.WebUI.Controllers
                     return View(viewModel);
                 }
                 //Second Make sure the name does not repeat
-                if (context.Collection().Where(p => p.Id != id).Any(p => p.Name == viewModel.Product.Name))
+                var proList = context.Collection().Where(p => p.Id != id);
+                if (proList.Any(p => p.Name == viewModel.Product.Name))
                 {
                     //product.cate
                     ModelState.AddModelError("NameNotUnique", "Product Name Is Exist Before");
@@ -256,7 +259,7 @@ namespace OnlineShop.WebUI.Controllers
                 #endregion
                 context.Commit();
                 TempData["Message"] = "Product Updated Successfully";
-                return RedirectToAction("Edit");
+                return RedirectToAction("Edit", new { slug = productToEdit.Slug });
 
             }
 
@@ -267,9 +270,9 @@ namespace OnlineShop.WebUI.Controllers
 
 
 
-        public ActionResult Delete(string id)
+        public ActionResult Delete(string slug)
         {
-            Product productToDelete = context.Find(id);
+            Product productToDelete = context.FindBySlug(slug);
 
             if (productToDelete == null)
             {
@@ -283,9 +286,9 @@ namespace OnlineShop.WebUI.Controllers
 
         [HttpPost]
         [ActionName("Delete")]
-        public ActionResult ConfirmDelete(string id)
+        public ActionResult ConfirmDelete(string slug)
         {
-            Product productToDelete = context.Find(id);
+            Product productToDelete = context.FindBySlug(slug);
 
             if (productToDelete == null)
             {
@@ -293,7 +296,7 @@ namespace OnlineShop.WebUI.Controllers
             }
             else
             {
-                context.Delete(id);
+                context.DeleteBySlug(slug);
                 context.Commit();
                 return RedirectToAction("Index");
             }
