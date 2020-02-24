@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OnlineShop.DataAccess.InMemory
 {
-    public class InMemoryRepository<T> : IRepository<T> where T :  BaseEntity 
+    public class InMemoryRepository<T> : IRepository<T> where T : BaseEntity
     {
 
         ObjectCache cache = MemoryCache.Default;
@@ -67,6 +67,19 @@ namespace OnlineShop.DataAccess.InMemory
             }
         }
 
+        public T FindBySlug(string slug)
+        {
+            T getItem = items.Find(i => i.Slug == slug);
+
+            if (getItem != null)
+            {
+                return getItem;
+            }
+            else
+            {
+                throw new Exception(className + "Not Found");
+            }
+        }
 
         public IQueryable<T> Collection()
         {

@@ -48,6 +48,12 @@ namespace OnlineShop.DataAccess.SQL
             return _dbSet.Find(id);
         }
 
+        public T FindBySlug(string slug)
+        {
+            return _dbSet.Find(slug);
+        }
+
+
         public void Insert(T item)
         {
             _dbSet.Add(item);

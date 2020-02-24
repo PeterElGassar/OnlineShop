@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 namespace OnlineShop.Core.Models
 {
-   public class ProductCategory:BaseEntity
+    public class ProductCategory : BaseEntity
     {
         public string Name { get; set; }
+
+
+       
+        public virtual ICollection<Product> Products { get; set; }
     }
 }

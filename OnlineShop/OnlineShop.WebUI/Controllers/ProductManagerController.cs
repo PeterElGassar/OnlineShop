@@ -44,14 +44,24 @@ namespace OnlineShop.WebUI.Controllers
         }
 
         [HttpPost]
-        public ActionResult Create(Product product, HttpPostedFileBase file)
+        public ActionResult Create(ProductManagerVM viewModel, HttpPostedFileBase file)
         {
+            viewModel.Categories= productCategoris.Collection().ToList();
+
+            //First Check Model State 
             if (!ModelState.IsValid)
             {
-                return View(product);
+                return View(viewModel);
             }
 
-
+            string id = viewModel.Product.Id;
+            //Second Make sure the name does not repeat
+            if (context.Collection().Where(p => p.Id != id).Any(p => p.Name == viewModel.Product.Name))
+            {
+                //product.cate
+                ModelState.AddModelError("NameNotUnique", "Product Name Is Exist Before");
+                return View(viewModel);
+            }
             #region Insert Image Of Product
             string imageExtention = Path.GetExtension(file.FileName).ToLower();
 
@@ -62,49 +72,56 @@ namespace OnlineShop.WebUI.Controllers
                 if (vaildTypes.Any(item => item == imageExtention))
                 {
 
+                    try
+                    {
+                        //Main Directory For All Products
+                        //Main Directory Must Exists from before
+                        var origenalDirectory = new DirectoryInfo(Server.MapPath(@"\") + @"Images\Uploads");
 
-                    //Main Directory For All Products
-                    //Main Directory Must Exists
-                    var origenalDirectory = new DirectoryInfo(Server.MapPath(@"\") + @"Images\Uploads");
+                        //Create Some Folders To Every Single Product
+                        string productsPath = Path.Combine(origenalDirectory.ToString(), "Products");
 
-                    //Create Some Folders To Every Single Product
-                    string productsPath = Path.Combine(origenalDirectory.ToString(), "Products");
+                        string singleProductPath = Path.Combine(origenalDirectory.ToString(), @"Products\" + viewModel.Product.Id);
 
-                    string singleProductPath = Path.Combine(origenalDirectory.ToString(), @"Products\" + product.Id);
+                        string productThumbPath = Path.Combine(origenalDirectory.ToString(), @"Products\" + viewModel.Product.Id + @"\Thumbs");
 
-                    string productThumbPath = Path.Combine(origenalDirectory.ToString(), @"Products\" + product.Id + @"\Thumbs");
+                        string productGalleryPath = Path.Combine(origenalDirectory.ToString(), @"Products\" + viewModel.Product.Id + @"\Gallery");
 
-                    string productGalleryPath = Path.Combine(origenalDirectory.ToString(), @"Products\" + product.Id + @"\Gallery");
+                        string productGalleryThumbsPath = Path.Combine(origenalDirectory.ToString(), @"Products\" + viewModel.Product.Id + @"\Gallery\Thumbs");
+                        //Exist All Path IF Not Exists yet
+                        if (!Directory.Exists(productsPath))
+                            Directory.CreateDirectory(productsPath);
 
-                    string productGalleryThumbsPath = Path.Combine(origenalDirectory.ToString(), @"Products\" + product.Id + @"\Gallery\Thumbs");
-                    //Exist All Path IF Not Exists yet
-                    if (!Directory.Exists(productsPath))
-                        Directory.CreateDirectory(productsPath);
+                        if (!Directory.Exists(singleProductPath))
+                            Directory.CreateDirectory(singleProductPath);
 
-                    if (!Directory.Exists(singleProductPath))
-                        Directory.CreateDirectory(singleProductPath);
+                        if (!Directory.Exists(productThumbPath))
+                            Directory.CreateDirectory(productThumbPath);
 
-                    if (!Directory.Exists(productThumbPath))
-                        Directory.CreateDirectory(productThumbPath);
+                        if (!Directory.Exists(productGalleryPath))
+                            Directory.CreateDirectory(productGalleryPath);
 
-                    if (!Directory.Exists(productGalleryPath))
-                        Directory.CreateDirectory(productGalleryPath);
+                        if (!Directory.Exists(productGalleryThumbsPath))
+                            Directory.CreateDirectory(productGalleryThumbsPath);
 
-                    if (!Directory.Exists(productGalleryThumbsPath))
-                        Directory.CreateDirectory(productGalleryThumbsPath);
+                        //======================================================//
+                        string imageName = file.FileName;
+                        viewModel.Product.Image = imageName;
+                        //======================Set Original Images ================================//
+                        string orignalImage = string.Format(@"{0}\{1}", singleProductPath, imageName);
+                        file.SaveAs(orignalImage);
+                        //======================Set Thumb Images ================================//
+                        string thumbIamge = string.Format(@"{0}\{1}", productThumbPath, imageName);
+                        WebImage img = new WebImage(file.InputStream);
+                        img.Resize(480, 640, true, true).Crop(1, 1, 1, 1).Write();
+                        img.Save(thumbIamge);
+                    }
+                    catch (Exception ex)
+                    {
 
-                    //======================================================//
-                    string imageName = file.FileName;
-                    product.Image = imageName;
-                    //======================Set Original Images ================================//
-                    string orignalImage = string.Format(@"{0}\{1}", singleProductPath, imageName);
-                    file.SaveAs(orignalImage);
-                    //======================Set Thumb Images ================================//
-                    string thumbIamge = string.Format(@"{0}\{1}", productThumbPath, imageName);
-                    WebImage img = new WebImage(file.InputStream);
-                    img.Resize(480, 640, true, true).Crop(1, 1, 1, 1).Write();
-                    img.Save(thumbIamge);
-
+                        TempData["Error"] = ex.Message;
+                        return View(viewModel);
+                    }
                 }
 
                 //thumbNail.Save(thumbIamge);
@@ -124,11 +141,20 @@ namespace OnlineShop.WebUI.Controllers
 
             #endregion
 
+            viewModel.Product.Slug = viewModel.Product.Name.ToLower().Replace(" ", "-").Replace(".", "-");
+            Product product = new Product()
+            {
+                Name = viewModel.Product.Name,
+                Slug = viewModel.Product.Name.ToLower().Replace(" ", "-").Replace(".", "-"),
+                Price = viewModel.Product.Price,
+                Image = viewModel.Product.Image,
+                ProductCategoryId = viewModel.Product.ProductCategoryId,
+            };
             context.Insert(product);
             context.Commit();
 
             TempData["Message"] = "Product Add Successfully";
-            return RedirectToAction("Index");
+            return RedirectToAction("Create");
 
         }
 
@@ -165,16 +191,25 @@ namespace OnlineShop.WebUI.Controllers
             }
             else
             {
+                //First Check Model State 
                 if (!ModelState.IsValid)
                 {
                     return View(viewModel);
                 }
-
+                //Second Make sure the name does not repeat
+                if (context.Collection().Where(p => p.Id != id).Any(p => p.Name == viewModel.Product.Name))
+                {
+                    //product.cate
+                    ModelState.AddModelError("NameNotUnique", "Product Name Is Exist Before");
+                    return View(viewModel);
+                }
                 productToEdit.Name = viewModel.Product.Name;
                 productToEdit.Category = viewModel.Product.Category;
                 productToEdit.Description = viewModel.Product.Description;
                 productToEdit.Price = viewModel.Product.Price;
                 productToEdit.Image = viewModel.Product.Image;
+                productToEdit.ProductCategoryId = viewModel.Product.ProductCategoryId;
+                productToEdit.Slug = viewModel.Product.Name.ToLower().Replace(" ", "-").Replace(".", "-");
 
                 #region Update Image
                 if (file != null && file.ContentLength > 0)
@@ -214,7 +249,6 @@ namespace OnlineShop.WebUI.Controllers
                     catch (Exception ex)
                     {
                         TempData["Error"] = ex.Message;
-
                         return View(viewModel);
                     }
                 }
