@@ -1,5 +1,7 @@
 ﻿using OnlineShop.Core.Contracts;
 using OnlineShop.Core.Models;
+using OnlineShop.Core.ViewModels;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +11,7 @@ using System.Web;
 
 namespace OnlineShop.Services
 {
-    public class BasketServies
+    public class BasketServies : IBasketServies
     {
         IRepository<Product> productContext;
         IRepository<Basket> basketContext;
@@ -76,7 +78,6 @@ namespace OnlineShop.Services
             //Last Thing Add This Cooke To Reponse
             httpContext.Response.Cookies.Add(cookie);
 
-
             return basket;
         }
 
@@ -119,6 +120,85 @@ namespace OnlineShop.Services
                 basketContext.Commit();
             }
 
+        }
+
+        public List<BasketItemVM> GetBasketItems(HttpContextBase httpContext)
+        {
+            //Get Basket
+            //Here IAm Path False Because I don't need Create New Basket 
+            var basket = GetBasket(httpContext, false);
+
+            if (basket != null)
+            {
+                //Query Throughtout basket to get specified infromation
+                var results = (
+                             from b in basket.BasketItems
+
+                             join p in productContext.Collection()
+                             on b.ProductId equals p.Id
+                             select new BasketItemVM()
+                             {
+                                 BasketItemId = b.Id,
+                                 Quentity = b.Quantity,
+                                 //Product Part
+                                 ProductName = p.Name,
+                                 Price = p.Price,
+                                 Image = p.Image
+                             }).ToList();
+
+                return results;
+            }
+            else
+            {
+                return new List<BasketItemVM>();
+            }
+        }
+
+
+        public BasketSummaryVM GetBasketSummary(HttpContextBase httpContext)
+        {
+            //Get Basket
+            //Here IAm Path False Because I don't need Create New Basket 
+            var basket = GetBasket(httpContext, false);
+            var model = new BasketSummaryVM(0, 0);
+            List<BasketItemVM> getBasketItems = GetBasketItems(httpContext);
+
+            if (basket != null)
+            {
+                if (getBasketItems != null)
+                {
+                    int? count = 0;
+                    decimal? total = 0;
+                    foreach (var item in getBasketItems)
+                    {
+                        count = +item.Quentity;
+                        total = +item.Quentity * item.Price;
+
+                    }
+                    model.BasketCount = count ?? 0;
+                    model.BasketTotal = total ?? decimal.Zero;
+                }
+               
+
+                //int? basketCount = (from item in basket.BasketItems
+                //                    select item.Quantity).Sum();
+
+
+
+                //decimal? basketTotal = (from item in basket.BasketItems
+                //                        join p in productContext.Collection()
+                //                        on item.ProductId equals p.Id
+                //                        select item.Quantity * p.Price).Sum();
+
+                //model.BasketCount = basketCount ?? 0;
+                //model.BasketTotal = basketTotal ?? decimal.Zero;
+
+                return model;
+            }
+            else
+            {
+                return model;
+            }
         }
     }
 }
