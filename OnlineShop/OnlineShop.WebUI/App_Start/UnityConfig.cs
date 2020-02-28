@@ -1,3 +1,7 @@
+using OnlineShop.Core.Contracts;
+using OnlineShop.Core.Models;
+using OnlineShop.DataAccess.SQL;
+using OnlineShop.Services;
 using System;
 
 using Unity;
@@ -42,6 +46,14 @@ namespace OnlineShop.WebUI
 
             // TODO: Register your type's mappings here.
             // container.RegisterType<IProductRepository, ProductRepository>();
+            container.RegisterType<IRepository<Product>, SQLRepository<Product>>();
+            container.RegisterType<IRepository<ProductCategory>, SQLRepository<ProductCategory>>();
+            //Baskets
+            container.RegisterType<IRepository<Basket>, IRepository<Basket>>();
+            container.RegisterType<IRepository<BasketItem>, IRepository<BasketItem>>();
+            container.RegisterType<IBasketService, BasketServics>();
+
+
         }
     }
 }
