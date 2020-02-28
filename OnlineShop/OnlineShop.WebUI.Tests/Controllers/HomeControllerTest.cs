@@ -6,6 +6,9 @@ using System.Web.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OnlineShop.WebUI;
 using OnlineShop.WebUI.Controllers;
+using OnlineShop.WebUI.Tests.Mocks;
+using OnlineShop.Core.Models;
+using OnlineShop.Core.Contracts;
 
 namespace OnlineShop.WebUI.Tests.Controllers
 {
@@ -13,42 +16,17 @@ namespace OnlineShop.WebUI.Tests.Controllers
     public class HomeControllerTest
     {
         [TestMethod]
-        public void Index()
+        public void IndexPageDoesReturnProducts()
         {
-            //// Arrange
-            //HomeController controller = new HomeController();
-
-            //// Act
-            //ViewResult result = controller.Index() as ViewResult;
-
-            //// Assert
-            //Assert.IsNotNull(result);
-        }
-
-        [TestMethod]
-        public void About()
-        {
+            IRepository<Product> productContext = new MockContext<Product>();
+            IRepository<ProductCategory> CategoryContext = new MockContext<ProductCategory>();
             // Arrange
-            //HomeController controller = new HomeController();
+            HomeController controller = new HomeController(productContext, CategoryContext);
 
-            //// Act
-            //ViewResult result = controller.About() as ViewResult;
+            //var result = controller.Index() as ViewResult;
 
-            //// Assert
-            //Assert.AreEqual("Your application description page.", result.ViewBag.Message);
         }
 
-        [TestMethod]
-        public void Contact()
-        {
-            //// Arrange
-            //HomeController controller = new HomeController();
 
-            //// Act
-            //ViewResult result = controller.Contact() as ViewResult;
-
-            //// Assert
-            //Assert.IsNotNull(result);
-        }
     }
 }

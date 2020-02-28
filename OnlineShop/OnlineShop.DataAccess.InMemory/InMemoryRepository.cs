@@ -112,6 +112,5 @@ namespace OnlineShop.DataAccess.InMemory
                 throw new Exception(className + "Not Found");
             }
         }
-        public void test() { }
     }
 }
