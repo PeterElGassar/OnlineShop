@@ -40,7 +40,7 @@
             <dt>
 
             </dt><dd>
-                <a class="btn btn-primary" href="#">Add To basket</a>
+                <a class="btn btn-primary" href="@Url.Action("AddToBasket", "Basket", new { productId = Model.Id })">Add To basket</a>
             </dd>
             <dd>
                 @Html.ActionLink("Back to List", "Index")

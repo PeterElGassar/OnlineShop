@@ -11,14 +11,14 @@ using System.Web;
 
 namespace OnlineShop.Services
 {
-    public class BasketServies : IBasketServies
+    public class BasketServics : IBasketService
     {
         IRepository<Product> productContext;
         IRepository<Basket> basketContext;
 
         public const string BasketSessionName = "eCommerceBasket";
 
-        public BasketServies(IRepository<Product> productContext, IRepository<Basket> basketContext)
+        public BasketServics(IRepository<Product> productContext, IRepository<Basket> basketContext)
         {
             this.productContext = productContext;
             this.basketContext = basketContext;
@@ -109,11 +109,11 @@ namespace OnlineShop.Services
             basketContext.Commit();
         }
 
-        public void RemoveFromBasket(HttpContextBase httpContext, string itemId)
+        public void RemoveFromBasket(HttpContextBase httpContext, string productId)
         {
             Basket basket = GetBasket(httpContext, true);
 
-            BasketItem singleItem = basket.BasketItems.FirstOrDefault(i => i.Id == itemId);
+            BasketItem singleItem = basket.BasketItems.FirstOrDefault(i => i.ProductId == productId);
             if (singleItem != null)
             {
                 basket.BasketItems.Remove(singleItem);
@@ -126,30 +126,44 @@ namespace OnlineShop.Services
         {
             //Get Basket
             //Here IAm Path False Because I don't need Create New Basket 
-            var basket = GetBasket(httpContext, false);
+            Basket basket = GetBasket(httpContext, false);
 
             if (basket != null)
             {
                 //Query Throughtout basket to get specified infromation
                 var results = (
                              from b in basket.BasketItems
-
                              join p in productContext.Collection()
                              on b.ProductId equals p.Id
                              select new BasketItemVM()
                              {
-                                 BasketItemId = b.Id,
-                                 Quentity = b.Quantity,
+                                 BasketItemId = b.ProductId,
+                                 Quantity = b.Quantity,
                                  //Product Part
                                  ProductName = p.Name,
                                  Price = p.Price,
                                  Image = p.Image
                              }).ToList();
 
+                //productContext.Collection().Join
+                //    (basket.BasketItems, i => i.Id, p => p.ProductId, (pro, item) => new BasketItemVM
+                //    {
+                //        //from basket
+                //        BasketItemId = item.Id,
+                //        Quantity = item.Quantity,
+                //        //from product
+                //        ProductName = pro.Name,
+                //        Price = pro.Price,
+                //        Image = pro.Image
+                //    }).ToList();
+
+
+
                 return results;
             }
             else
             {
+                //Return Empty List Of Product
                 return new List<BasketItemVM>();
             }
         }
@@ -161,37 +175,37 @@ namespace OnlineShop.Services
             //Here IAm Path False Because I don't need Create New Basket 
             var basket = GetBasket(httpContext, false);
             var model = new BasketSummaryVM(0, 0);
-            List<BasketItemVM> getBasketItems = GetBasketItems(httpContext);
+            //List<BasketItemVM> getBasketItems = GetBasketItems(httpContext);
 
             if (basket != null)
             {
-                if (getBasketItems != null)
-                {
-                    int? count = 0;
-                    decimal? total = 0;
-                    foreach (var item in getBasketItems)
-                    {
-                        count = +item.Quentity;
-                        total = +item.Quentity * item.Price;
+                //if (getBasketItems != null)
+                //{
+                //    int? count = 0;
+                //    decimal? total = 0;
+                //    foreach (var item in getBasketItems)
+                //    {
+                //        count = +item.Quantity;
+                //        total = +item.Quantity * item.Price;
 
-                    }
-                    model.BasketCount = count ?? 0;
-                    model.BasketTotal = total ?? decimal.Zero;
-                }
-               
-
-                //int? basketCount = (from item in basket.BasketItems
-                //                    select item.Quantity).Sum();
+                //    }
+                //    model.BasketCount = count ?? 0;
+                //    model.BasketTotal = total ?? decimal.Zero;
+                //}
 
 
+                int? basketCount = (from item in basket.BasketItems
+                                    select item.Quantity).Sum();
 
-                //decimal? basketTotal = (from item in basket.BasketItems
-                //                        join p in productContext.Collection()
-                //                        on item.ProductId equals p.Id
-                //                        select item.Quantity * p.Price).Sum();
 
-                //model.BasketCount = basketCount ?? 0;
-                //model.BasketTotal = basketTotal ?? decimal.Zero;
+
+                decimal? basketTotal = (from item in basket.BasketItems
+                                        join p in productContext.Collection()
+                                        on item.ProductId equals p.Id
+                                        select item.Quantity * p.Price).Sum();
+
+                model.BasketCount = basketCount ?? 0;
+                model.BasketTotal = basketTotal ?? decimal.Zero;
 
                 return model;
             }

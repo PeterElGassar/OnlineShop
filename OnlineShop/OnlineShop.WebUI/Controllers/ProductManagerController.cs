@@ -63,12 +63,14 @@ namespace OnlineShop.WebUI.Controllers
                 return View(viewModel);
             }
             #region Insert Image Of Product
-            string imageExtention = Path.GetExtension(file.FileName).ToLower();
 
-            string[] vaildTypes = { ".jpg", ".jpeg", ".png", ".gif" };
 
             if (file != null && file.ContentLength > 0)
             {
+                string imageExtention = Path.GetExtension(file.FileName).ToLower();
+
+                string[] vaildTypes = { ".jpg", ".jpeg", ".png", ".gif" };
+
                 if (vaildTypes.Any(item => item == imageExtention))
                 {
 
@@ -123,28 +125,15 @@ namespace OnlineShop.WebUI.Controllers
                         return View(viewModel);
                     }
                 }
-
-                //thumbNail.Save(thumbIamge);
-                //using (Image img = Image.FromFile(orgFile))
-                //{
-                //    Image thumbNail = new Bitmap(width, height, img.PixelFormat);
-                //    Graphics g = Graphics.FromImage(thumbNail);
-                //    g.CompositingQuality = CompositingQuality.HighQuality;
-                //    g.SmoothingMode = SmoothingMode.HighQuality;
-                //    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                //    Rectangle rect = new Rectangle(0, 0, width, height);
-                //    g.DrawImage(img, rect);
-                //    thumbNail.Save(resizedFile, format);
-                //}
-
             }
-
             #endregion
 
-            viewModel.Product.Slug = viewModel.Product.Name.ToLower().Replace(" ", "-").Replace(".", "-");
+            //viewModel.Product.Slug = viewModel.Product.Name.ToLower().Replace(" ", "-").Replace(".", "-");
             Product product = new Product()
             {
+                Id = viewModel.Product.Id,
                 Name = viewModel.Product.Name,
+                Description = viewModel.Product.Description,
                 Slug = viewModel.Product.Name.ToLower().Replace(" ", "-").Replace(".", "-"),
                 Price = viewModel.Product.Price,
                 Image = viewModel.Product.Image,
@@ -237,6 +226,15 @@ namespace OnlineShop.WebUI.Controllers
                             file2.Delete();
                         }
 
+
+                    }
+                    catch (Exception ex)
+                    {
+                        TempData["Error"] = ex.Message;
+                        return View(viewModel);
+                    }
+                    finally
+                    {
                         //New Image Data
                         string imageName = file.FileName;
                         productToEdit.Image = imageName;
@@ -248,11 +246,6 @@ namespace OnlineShop.WebUI.Controllers
                         WebImage img = new WebImage(file.InputStream);
                         img.Resize(480, 640, true, true).Crop(1, 1, 1, 1).Write();
                         img.Save(path2);
-                    }
-                    catch (Exception ex)
-                    {
-                        TempData["Error"] = ex.Message;
-                        return View(viewModel);
                     }
                 }
 
@@ -297,11 +290,48 @@ namespace OnlineShop.WebUI.Controllers
             else
             {
                 context.DeleteBySlug(slug);
+
+                #region Delete Image
+                var orignalDirectory = new DirectoryInfo(Server.MapPath(@"\Images\Uploads\Products"));
+
+                string path1 = Path.Combine(orignalDirectory.ToString() + "\\" + productToDelete.Id);
+
+
+                if (Directory.Exists(path1))
+                {
+                    Directory.Delete(path1, true);
+                }
+                #endregion
+
+                //====================saveChanges==============
                 context.Commit();
                 return RedirectToAction("Index");
             }
+
         }
 
 
     }
 }
+
+
+
+
+
+
+
+
+
+
+//thumbNail.Save(thumbIamge);
+//using (Image img = Image.FromFile(orgFile))
+//{
+//    Image thumbNail = new Bitmap(width, height, img.PixelFormat);
+//    Graphics g = Graphics.FromImage(thumbNail);
+//    g.CompositingQuality = CompositingQuality.HighQuality;
+//    g.SmoothingMode = SmoothingMode.HighQuality;
+//    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+//    Rectangle rect = new Rectangle(0, 0, width, height);
+//    g.DrawImage(img, rect);
+//    thumbNail.Save(resizedFile, format);
+//}

@@ -23,6 +23,7 @@ namespace OnlineShop.Core.Models
 
 
         [Range(0, 10000)]
+        [Required]
         public decimal Price { get; set; }
 
         public string Category { get; set; }
