@@ -82,6 +82,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\BasketControllerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controllers\HomeControllerTest.cs" />
   </ItemGroup>
@@ -92,6 +93,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\OnlineShop.Core\OnlineShop.Core.csproj">
+      <Project>{305d8fb4-488b-4c52-a82f-2f799533f0f0}</Project>
+      <Name>OnlineShop.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OnlineShop.DataAccess.SQL\OnlineShop.DataAccess.SQL.csproj">
+      <Project>{b73e6e7f-82c0-4a9d-8797-068d4db1e6b5}</Project>
+      <Name>OnlineShop.DataAccess.SQL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OnlineShop.WebUI\OnlineShop.WebUI.csproj">
       <Project>{89ddf590-d140-4d79-9ec2-1efa2394b5a0}</Project>
       <Name>OnlineShop.WebUI</Name>

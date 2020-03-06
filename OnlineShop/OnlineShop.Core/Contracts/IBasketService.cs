@@ -16,5 +16,7 @@ namespace OnlineShop.Core.Contracts
 
         List<BasketItemVM> GetBasketItems(HttpContextBase httpContext);
         BasketSummaryVM GetBasketSummary(HttpContextBase httpContext);
+
+        void ClearBasketItems(HttpContextBase httpContext);
     }
 }

@@ -11,21 +11,17 @@ using System.Web;
 
 namespace OnlineShop.Services
 {
-    public class BasketServics : IBasketService
+    public class BasketService : IBasketService
     {
         IRepository<Product> productContext;
         IRepository<Basket> basketContext;
 
         public const string BasketSessionName = "eCommerceBasket";
 
-        public BasketServics(IRepository<Product> productContext, IRepository<Basket> basketContext)
+        public BasketService(IRepository<Product> productContext, IRepository<Basket> basketContext)
         {
             this.productContext = productContext;
             this.basketContext = basketContext;
-        }
-        public BasketServics()
-        {
-
         }
         //Privet fuction to check If Cookies Exist Or Not 
         private Basket GetBasket(HttpContextBase httpContext, bool createIfNll)
@@ -217,5 +213,14 @@ namespace OnlineShop.Services
                 return model;
             }
         }
+
+
+        public void ClearBasketItems(HttpContextBase httpContext)
+        {
+            Basket basket = GetBasket(httpContext, false);
+            basket.BasketItems.Clear();
+            basketContext.Commit();
+        }
+       
     }
 }
